@@ -1,17 +1,18 @@
 import cs50
 import sys
 
-#Globals
+# Globals
 LOWERVAL = 97
 CAPIVAL = 65
 ALPHABET = 26
 
-def main() :
+
+def main():
 
     argc = len(sys.argv)
 
     # Verify given arguments (there is only one extra string and it is only letters)
-    if len(sys.argv) == 2 and sys.argv[1].isalpha() :
+    if len(sys.argv) == 2 and sys.argv[1].isalpha():
 
         # Store each letter of the key in a list
         keyAlpha = list(sys.argv[1])
@@ -19,7 +20,7 @@ def main() :
         key = []
 
         # Use the list to get the shiftKey (i.e. numerical value)
-        for i in keyAlpha :
+        for i in keyAlpha:
             uniVal = ord(i)
             key.append((uniVal - CAPIVAL) if i.isupper() else (uniVal - LOWERVAL))
 
@@ -30,9 +31,9 @@ def main() :
         cipherText = encrypt(plainText, key, keyLength)
 
         # Output the cipher
-        print("Ciphertext: ", cipherText)
+        print("Ciphertext:", cipherText)
 
-    else :
+    else:
         # If verification fails, exit the code and return an error
         print("Usage: python vigenere.py k")
         return 1
@@ -49,14 +50,14 @@ def encrypt(inputString, key, keyLength) :
     keyIndex = 0
 
     # Iterate across the length of the plainText
-    while stringIndex < stringLen :
+    while stringIndex < stringLen:
 
         # When we have iterated across the key, loop back to 0
-        if keyIndex >= keyLength :
+        if keyIndex >= keyLength:
             keyIndex = 0
 
         # We do nothing to the item if it is not alphabetical
-        if output[stringIndex].isalpha() :
+        if output[stringIndex].isalpha():
             # Lets get the numeric value of the letter and remember its case
             rawVal = ord(output[stringIndex])
             isCap = True if output[stringIndex].isupper() else False
@@ -81,5 +82,5 @@ def encrypt(inputString, key, keyLength) :
     return output
 
 
-if __name__ == "__main__" :
+if __name__ == "__main__":
     main()
