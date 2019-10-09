@@ -36,7 +36,7 @@ def main():
     else:
         # If verification fails, exit the code and return an error
         print("Usage: python vigenere.py k")
-        return 1
+        sys.exit(1)
 
 
 # Encrypt the plaintext using the given key
