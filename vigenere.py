@@ -25,13 +25,13 @@ def main():
             key.append((uniVal - CAPIVAL) if i.isupper() else (uniVal - LOWERVAL))
 
         # Request the plaintext message
-        plainText = cs50.get_string("Plaintext: ")
+        plainText = cs50.get_string("plaintext: ")
 
         # Execute functions to perform the cipher
         cipherText = encrypt(plainText, key, keyLength)
 
         # Output the cipher
-        print("Ciphertext:", cipherText)
+        print("ciphertext:", cipherText)
 
     else:
         # If verification fails, exit the code and return an error
