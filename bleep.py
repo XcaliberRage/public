@@ -54,7 +54,7 @@ def censorWord(word, flagged):
 
     # Whatever word is given, check the list of flagged words
     # If the word is there, replace each character with *
-    return "".join(["*" for char in word]) if word.lower() in flagged.lower() else word
+    return "".join(["*" for char in word]) if word.lower() in flagged else word
 
 
 if __name__ == "__main__":
