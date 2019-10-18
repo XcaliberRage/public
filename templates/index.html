@@ -21,61 +21,56 @@
             </div>
 
             <div class="form-row">
-                <div class="form-check">
-                    <input class="form-check-input" type="radio" name="algorithm" value="lines" id="lines" checked
-                        onclick=
-                            "var input = document.getElementById('length');
-                            if(this.checked)
-                            {
-                                input.disabled = true;
-                            }"
-                    />
-                    <label class="form-check-label" for="lines">
-                        Lines
-                    </label>
-                </div>
-            </div>
+                <div class="form-group">
+                    <div class="form-check">
+                        <label class="form-check-label">
+                            <input class="form-check-input" type="radio" name="algorithm" value="lines" id="lines" checked
+                                onclick=
+                                    "var input = document.getElementById('length');
+                                    if(this.checked)
+                                    {
+                                        input.disabled = true;
+                                    }"
+                            />
 
-            <div class="form-row">
-                <div class="form-check">
-                    <input class="form-check-input" type="radio" name="algorithm" value="sentences" id="sentences"
-                        onclick=
-                            "var input = document.getElementById('length');
-                            if(this.checked)
-                            {
-                                input.disabled = true;
-                            }"
-                    />
-                    <label class="form-check-label" for="sentences">
-                        Sentences
-                    </label>
-                </div>
-            </div>
+                            Lines
 
-            <div class="form-row">
-                <div class="form-check">
-                    <input class="form-check-input" type="radio" name="algorithm" value="substrings" id="substrings"
-                        onclick=
-                            "var input = document.getElementById('length');
-                            if(this.checked)
-                            {
-                                input.disabled = false;
-                                input.focus();
-                            }"
-                    />
-                    <label class="form-check-label" for="substrings">
-                        Substrings
-                    </label>
-            </div>
-            </div>
+                        </label>
+                    </div>
 
+                    <div class="form-check">
+                        <label class="form-check-label">
+                            <input class="form-check-input" type="radio" name="algorithm" value="sentences" id="sentences"
+                                onclick=
+                                    "var input = document.getElementById('length');
+                                    if(this.checked)
+                                    {
+                                        input.disabled = true;
+                                    }"
+                            />
 
-            <div class="form-row">
-                <div class="form-check">
-                    <input class="form-check-input" type="number" name="length" min="1" id="length" value="1" disabled>
-                    <label class="form-check-label" for="length">
-                        Length
-                    </label>
+                            Sentences
+
+                        </label>
+                    </div>
+
+                    <div class="form-check">
+                        <label class="form-check-label">
+                            <input class="form-check-input" type="radio" name="algorithm" value="substrings" id="substrings"
+                                onclick=
+                                    "var input = document.getElementById('length');
+                                    if(this.checked)
+                                    {
+                                        input.disabled = false;
+                                        input.focus();
+                                    }"
+                            />
+
+                            Substrings
+
+                            <input class="form-control form-control-sm" type="number" name="length" min="1" id="length" placeholder="of length n" disabled>
+                        </label>
+                    </div>
                 </div>
             </div>
 
