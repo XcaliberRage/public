@@ -7,8 +7,9 @@ from flask import Flask, jsonify, redirect, render_template, request
 
 # Global constant fieldnames for the CSV
 fieldnames = ['name', 'breed', 'gender', 'neutered', 'age_group', 'age_year', 'age_month', 'age_unknown']
+# Global constant names for the ageGroups (for validation)
 ageGroups = ['kitten', 'adult', 'prime', 'mature', 'senior', 'geriatric']
-ASCII_NUM_VAL= 48 # i.e. 0 in ASCII
+# Having breeds as a global variable is helpful
 breeds = []
 
 # Configure application
@@ -16,6 +17,7 @@ app = Flask(__name__)
 
 # Reload templates when they are changed
 app.config["TEMPLATES_AUTO_RELOAD"] = True
+
 
 @app.after_request
 def after_request(response):
@@ -38,13 +40,15 @@ def get_form():
         with open('CatBreeds.txt', 'r') as file:
             for line in file:
                 breeds.append(line.strip('\n'))
-    except ValueError:
+    except FileNotFoundError:
         errors = ["Error loading 'CatBreeds.txt'"]
         return render_template("error.html", messages=errors)
 
     return render_template("form.html", breeds=breeds)
 
 
+# When submit is pressed on the form, validate all fields (in case JS got bypassed)
+# If successful the Cat gets saved and the user is taken to the table of cats
 @app.route("/form", methods=["POST"])
 def post_form():
 
@@ -52,15 +56,15 @@ def post_form():
 
     # Sure would be nice to not write request.form.get 7 times...
     thisCat = Cat(
-            request.form.get("name"),
-            request.form.get("breed"),
-            request.form.get("gender"),
-            request.form.get("neutered"),
-            request.form.get("ageGroup"),
-            request.form.get("years"),
-            request.form.get("months"),
-            request.form.get("ageUnknown")
-            )
+        request.form.get("name"),
+        request.form.get("breed"),
+        request.form.get("gender"),
+        request.form.get("neutered"),
+        request.form.get("ageGroup"),
+        request.form.get("years"),
+        request.form.get("months"),
+        request.form.get("ageUnknown")
+        )
 
     thisCat.neutered = False if not thisCat.neutered else True
     thisCat.ageUnknown = False if not thisCat.ageUnknown else True
@@ -80,10 +84,11 @@ def post_form():
     if not thisCat.gender:
         errors.append("You didn't select a gender")
 
+    # A valid age Group
     if not thisCat.ageGroup in ageGroups:
         errors.append(thisCat.ageGroup + " is not a valid age group, please choose one provided")
 
-    # An age group within range OR Age unknown checked (BUT NOT BOTH)
+    # An age within range OR Age unknown checked (BUT NOT BOTH)
     if not thisCat.ageUnknown:
         if not (thisCat.years or thisCat.months):
             errors.append("You didn't provide a proper age in numerals or check 'Age Unknown'")
@@ -103,6 +108,7 @@ def post_form():
             except ValueError:
                 errors.append("You put something weird in the Year or Month box")
 
+    # If there are any errors that got past the form validation, you get sent to a page that specifies them and there is no csv submission
     if errors:
         return render_template("error.html", messages=errors)
     else:
@@ -110,6 +116,7 @@ def post_form():
         return redirect("/sheet")
 
 
+# Grab all the cats saved in survey.csv and show them in a happy table
 @app.route("/sheet", methods=["GET"])
 def get_sheet():
 
