@@ -1,0 +1,197 @@
+{% extends "layout.html" %}
+
+{% block main %}
+
+    <!-- http://getbootstrap.com/docs/4.1/content/typography/ -->
+    <h1 class="mb-3">Cat.</h1>
+
+    <!-- http://getbootstrap.com/docs/4.1/components/forms/ -->
+    <form class="needs-validation" action="/form" method="post" novalidate>
+
+        <!-- Name Section -->
+        <label class="form-control-label" for="name">Your Cat's Name: </label>
+        <div class="form-group">
+            <input autocomplete="off" autofocus class="form-control" id="name" name="name" placeholder="Name" type="text" required>
+            <div class="invalid-feedback">
+                Please give a name for the cat
+            </div>
+        </div>
+
+        <!-- Breed section -->
+        <label class="form-control-label" for="breedEntry">Breed:</label>
+        <div class="form-group">
+
+            <!-- In this section I want to provide a list of select options as populated by a file that contains every breed of cat as found on wikipedia -->
+            <select class="form-control" id="breedEntry" name="breed" required>
+
+            <!-- Need to populate using jQuery -->
+                <option disabled selected value>Select a breed or "Unknown"</option>
+                {% for breed in breeds: %}
+                    <option value="{{breed}}">{{breed}}</option>
+                {% endfor %}
+            </select>
+
+            <div class="invalid-feedback">
+                Please specify a Breed or "Unknown"
+            </div>
+
+        </div>
+
+        <!-- Gender section -->
+        <label class="form-check-label" for="gender"> Gender: </label>
+        <div class="form-group" id=gender>
+
+                <div class="form-check">
+                    <input class="form-check-input" id="Male" name="gender" type="radio" value="Male" required>
+                    <label class="form-check-label" for="Male">
+                        Male
+                    </label>
+                </div>
+
+                <div class="form-check">
+                    <input class="form-check-input" id="Female" name="gender" type="radio" value="Female" required>
+                    <label class="form-check-label" for="Female">
+                        Female
+                    </label>
+                </div>
+
+                <div class="form-check">
+                    <input class="form-check-input" id="Unknown" name="gender" type="radio" value="Unknown" required>
+                    <label class="form-check-label" for="Unknown">
+                        Unknown
+                    </label>
+
+                    <div class="invalid-feedback">
+                        Please specify a gender
+                    </div>
+                </div>
+
+                <div class="form-check">
+                    <input class="form-check-input" id="neutered" name="neutered" type="checkbox" value="neutered">
+                    <label class="form-check-label" for="neutered">
+                        Neutered
+                    </label>
+                </div>
+
+        </div>
+
+        <!-- Age Section -->
+        <label class="form-control-label" for="agesGroup"> Age: </label>
+        <div class="form-group" id="agesGroup">
+            <select class="form-control" id="ageGroups" name="ageGroup" onload="{ageUpdate(this.value)}" onchange="{ageUpdate(this.value)}" required>
+
+                <option disabled selected value>Select an age Group:</option>
+                <option value="kitten">Kitten (up to 6 months)</option>
+                <option value="adult">Adult (6 months to 3 yrs)</option>
+                <option value="prime">Prime (3-6 yrs)</option>
+                <option value="mature">Mature (7-10 yrs)</option>
+                <option value="senior">Senior (11-14 yrs)</option>
+                <option value="geriatric">Geriatric (15+ yrs)</option>
+            </select>
+            <div class="invalid-feedback">
+                Please select a valid age group
+            </div>
+
+            <div class="form-group" id="ages">
+
+                <div class="row">
+                    <div class="col">
+                        <label class="form-control-label" for="age">
+                            Age in Years/Months:
+
+                            <input type="number" class="form-control ageVals" name="years" onkeypress="return event.charCode >= 48 && event.charCode <= 57" id="years" value="0" min="0" max="0" required>
+                            <input type="number" class="form-control ageVals" name="months" onkeypress="return event.charCode >= 48 && event.charCode <= 57"  id="months" value="0" min="0" max="12" required>
+
+                            <div class="invalid-feedback">
+                                Please specify an age within the group bounds or check "Age Unknown"
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-check">
+                    <input class="form-check-input" id="ageUnknown" name="ageUnknown" type="checkbox" onpageshow="{ageEnable(this.checked)}" onchange="{ageEnable(this.checked)}">
+
+                    <label class="form-check-label" for="ageUnknown">
+                        Age Unknown
+                    </label>
+                </div>
+
+            </div>
+        </div>
+
+
+        <!-- http://getbootstrap.com/docs/4.1/components/buttons/ -->
+        <button class="btn btn-primary" type="submit">Submit</button>
+
+    </form>
+
+    <script>
+
+        /* Modify the min & max values on the age field */
+
+        function ageUpdate(ageGroup) {
+            var target = document.getElementById('years');
+            var minVal = '0';
+            var maxVal = '0';
+
+            switch(ageGroup) {
+                case 'kitten':
+                    break;
+                case 'adult':
+                    minVal = '0';
+                    maxVal = '3';
+                    break;
+                case 'prime':
+                    minVal = '3';
+                    maxVal = '6';
+                    break;
+                case 'mature':
+                    minVal = '7';
+                    maxVal = '10';
+                    break;
+                case 'senior':
+                    minVal = '11';
+                    maxVal = '14';
+                    break;
+                case 'geriatric':
+                    minVal = '15';
+                    maxVal = '';
+                    break;
+                default:
+            }
+
+            target.min = minVal;
+            target.max = maxVal;
+        }
+
+
+        function ageEnable(outcome) {
+            document.getElementById('years').disabled = outcome;
+            document.getElementById('months').disabled = outcome;
+            document.getElementById('years').required = !outcome;
+            document.getElementById('months').required = !outcome;
+        }
+
+        // Example starter JavaScript for disabling form submissions if there are invalid fields
+        (function() {
+          'use strict';
+          window.addEventListener('load', function() {
+            // Fetch all the forms we want to apply custom Bootstrap validation styles to
+            var forms = document.getElementsByClassName('needs-validation');
+            // Loop over them and prevent submission
+            var validation = Array.prototype.filter.call(forms, function(form) {
+              form.addEventListener('submit', function(event) {
+                if (form.checkValidity() === false) {
+                  event.preventDefault();
+                  event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+              }, false);
+            });
+          }, false);
+        })();
+
+    </script>
+
+{% endblock %}
