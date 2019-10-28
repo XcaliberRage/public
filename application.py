@@ -1,16 +1,13 @@
 import cs50
 import csv
 import sys
-from catSurveyOps import Cat, writeCSV, switcher, loadCSV
+from catSurveyOps import writeCSV, loadCSV, getBreeds, validateThisCat
+from cat import Cat
 
 from flask import Flask, jsonify, redirect, render_template, request
 
-# Global constant fieldnames for the CSV
+# Global constant fieldnames for the CSV, i need to use this list in two seperate functions
 fieldnames = ['name', 'breed', 'gender', 'neutered', 'age_group', 'age_year', 'age_month', 'age_unknown']
-# Global constant names for the ageGroups (for validation)
-ageGroups = ['kitten', 'adult', 'prime', 'mature', 'senior', 'geriatric']
-# Having breeds as a global variable is helpful
-breeds = []
 
 # Configure application
 app = Flask(__name__)
@@ -36,12 +33,9 @@ def get_index():
 @app.route("/form", methods=["GET"])
 def get_form():
 
-    try:
-        with open('CatBreeds.txt', 'r') as file:
-            for line in file:
-                breeds.append(line.strip('\n'))
-    except FileNotFoundError:
-        errors = ["Error loading 'CatBreeds.txt'"]
+    nofile, breeds, errors = getBreeds()
+
+    if nofile:
         return render_template("error.html", messages=errors)
 
     return render_template("form.html", breeds=breeds)
@@ -52,64 +46,27 @@ def get_form():
 @app.route("/form", methods=["POST"])
 def post_form():
 
-    errors = []
+    form = request.form
 
-    # Sure would be nice to not write request.form.get 7 times...
+    # Sure would be nice to not write form.get 7 times...
     thisCat = Cat(
-        request.form.get("name"),
-        request.form.get("breed"),
-        request.form.get("gender"),
-        request.form.get("neutered"),
-        request.form.get("ageGroup"),
-        request.form.get("years"),
-        request.form.get("months"),
-        request.form.get("ageUnknown")
-        )
+        form.get("name"),
+        form.get("breed"),
+        form.get("gender"),
+        form.get("neutered"),
+        form.get("ageGroup"),
+        form.get("years"),
+        form.get("months"),
+        form.get("ageUnknown")
+    )
 
-    thisCat.neutered = False if not thisCat.neutered else True
-    thisCat.ageUnknown = False if not thisCat.ageUnknown else True
+    thisCat.neutered = thisCat.neutered == 'neutered'
+    thisCat.ageUnknown = thisCat.ageUnknown == 'unknown'
 
-    # Validation needs:
-    # A name
-    if not thisCat.name:
-        errors.append("You didn't provide a name for your Cat!")
-
-    # A chosen cat Breed
-    if not thisCat.breed:
-        errors.append("You didn't select a breed or Unknown'")
-    elif not thisCat.breed in breeds:
-        errors.append("Is this list of breeds really not extensive enough for you?")
-
-    # A gender (or unkown)
-    if not thisCat.gender:
-        errors.append("You didn't select a gender")
-
-    # A valid age Group
-    if not thisCat.ageGroup in ageGroups:
-        errors.append(thisCat.ageGroup + " is not a valid age group, please choose one provided")
-
-    # An age within range OR Age unknown checked (BUT NOT BOTH)
-    if not thisCat.ageUnknown:
-        if not (thisCat.years or thisCat.months):
-            errors.append("You didn't provide a proper age in numerals or check 'Age Unknown'")
-        else:
-            try:
-                givenYears = int(thisCat.years)
-                givenMonths = int(thisCat.months)
-
-                minVal, maxVal = switcher(thisCat.ageGroup)
-
-                maxMonth = 12 if not thisCat.ageGroup == 'kitten' else 6
-                minMonth = 6 if thisCat.ageGroup == 'adult' and givenYears == 0 else 0
-
-                if not (minVal <= givenYears and (maxVal == 50 or givenYears <= maxVal)) and (minMonth <= givenMonths <= maxMonth):
-                    errors.append("Given age is out of Age Group bounds")
-
-            except ValueError:
-                errors.append("You put something weird in the Year or Month box")
+    validated, errors = validateThisCat(thisCat)
 
     # If there are any errors that got past the form validation, you get sent to a page that specifies them and there is no csv submission
-    if errors:
+    if not validated:
         return render_template("error.html", messages=errors)
     else:
         writeCSV(thisCat, fieldnames)
@@ -120,9 +77,10 @@ def post_form():
 @app.route("/sheet", methods=["GET"])
 def get_sheet():
 
-    catDict = loadCSV(fieldnames)
+    # Load csv returns a tuple boolean, dictionary
+    loaded, catDict = loadCSV(fieldnames)
 
-    if not catDict:
+    if not loaded:
         errors = ["Error loading 'survey.csv'"]
         return render_template("error.html", messages=errors)
 

@@ -1,0 +1,3 @@
+name,breed,gender,neutered,age_group,age_year,age_month,age_unknown
+Momo,American Shorthair,Female,True,mature,7,0,False
+Sora,Maine Coon,Female,True,prime,5,9,False
